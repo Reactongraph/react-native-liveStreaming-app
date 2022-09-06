@@ -9,11 +9,10 @@
 import React from 'react';
 import AppNavigator from './Container';
 
-
-const App: () => React$Node = () => {
+const App = () => {
   return (
     <>
-        <AppNavigator />
+      <AppNavigator />
     </>
   );
 };

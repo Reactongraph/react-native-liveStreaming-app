@@ -1,60 +1,55 @@
-import React, {Component} from 'react';
+import React, {Component, useRef, useState} from 'react';
 
 import {Text, TouchableOpacity, View, Image} from 'react-native';
 import {PLAY} from '../../utils/common';
 import Video from 'react-native-video';
 import {styles} from './style';
 
-export default class PlayVideo extends Component {
-  state = {
-    rate: 1,
-    volume: 1,
-    muted: false,
-    resizeMode: 'contain',
-    duration: 0.0,
-    currentTime: 0.0,
-    paused: true,
+const PlayVideo = () => {
+  const [rate, setRate] = useState(1);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
+  const [resizeMode, setResizemode] = useState('contain');
+  const [duration, setDuration] = useState(0.0);
+  const [currentTime, setCurrenttime] = useState(0.0);
+  const [paused, setPaused] = useState(true);
+  const video = useRef(null);
+
+  const onLoad = () => {
+    setDuration(duration);
   };
 
-  video: Video;
-
-  onLoad = data => {
-    this.setState({duration: data.duration});
+  const onProgress = data => {
+    setCurrenttime(currentTime);
   };
 
-  onProgress = data => {
-    this.setState({currentTime: data.currentTime});
+  const onEnd = () => {
+    setPaused(true);
+    video.current.seek(0);
   };
 
-  onEnd = () => {
-    this.setState({paused: true});
-    this.video.seek(0);
+  const onAudioBecomingNoisy = () => {
+    setPaused(true);
   };
 
-  onAudioBecomingNoisy = () => {
-    this.setState({paused: true});
+  const onAudioFocusChanged = hasAudioFocus => {
+    setPaused(!hasAudioFocus);
   };
 
-  onAudioFocusChanged = (event: {hasAudioFocus: boolean}) => {
-    this.setState({paused: !event.hasAudioFocus});
-  };
-
-  getCurrentTimePercentage() {
-    if (this.state.currentTime > 0) {
-      return (
-        parseFloat(this.state.currentTime) / parseFloat(this.state.duration)
-      );
+  const getCurrentTimePercentage = () => {
+    if (currentTime > 0) {
+      return parseFloat(currentTime) / parseFloat(duration);
     }
     return 0;
-  }
+  };
 
-  renderRateControl(rate) {
-    const isSelected = this.state.rate === rate;
+  const renderRateControl = rate => {
+    const isSelected = rate === rate;
 
     return (
       <TouchableOpacity
         onPress={() => {
-          this.setState({rate});
+          setRate(rate);
         }}>
         <Text
           style={[
@@ -65,15 +60,15 @@ export default class PlayVideo extends Component {
         </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
-  renderResizeModeControl(resizeMode) {
-    const isSelected = this.state.resizeMode === resizeMode;
+  const renderResizeModeControl = resizeMode => {
+    const isSelected = resizeMode === resizeMode;
 
     return (
       <TouchableOpacity
         onPress={() => {
-          this.setState({resizeMode});
+          setResizemode(resizeMode);
         }}>
         <Text
           style={[
@@ -84,15 +79,15 @@ export default class PlayVideo extends Component {
         </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
-  renderVolumeControl(volume) {
-    const isSelected = this.state.volume === volume;
+  const renderVolumeControl = volume => {
+    const isSelected = volume === volume;
 
     return (
       <TouchableOpacity
         onPress={() => {
-          this.setState({volume});
+          setVolume(volume);
         }}>
         <Text
           style={[
@@ -103,62 +98,56 @@ export default class PlayVideo extends Component {
         </Text>
       </TouchableOpacity>
     );
-  }
+  };
 
-  render() {
-    // const flexCompleted = this.getCurrentTimePercentage() * 100;
-    // const flexRemaining = (1 - this.getCurrentTimePercentage()) * 100;
-    const {paused} = this.state;
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.fullScreen}
+        onPress={() => setPaused(!paused)}>
+        <Video
+          ref={video}
+          source={{
+            uri:
+              'https://stream.mux.com/YAQEybr3Oi2VDYx1gE3N00zAqU4AxQ2xo.m3u8',
+          }}
           style={styles.fullScreen}
-          onPress={() => this.setState({paused: !this.state.paused})}>
-          <Video
-            ref={(ref: Video) => {
-              this.video = ref;
-            }}
-            source={{
-              uri:
-                'https://stream.mux.com/YAQEybr3Oi2VDYx1gE3N00zAqU4AxQ2xo.m3u8',
-            }}
-            style={styles.fullScreen}
-            rate={this.state.rate}
-            paused={this.state.paused}
-            volume={this.state.volume}
-            muted={this.state.muted}
-            resizeMode={this.state.resizeMode}
-            onLoad={this.onLoad}
-            onProgress={this.onProgress}
-            onEnd={this.onEnd}
-            onAudioBecomingNoisy={this.onAudioBecomingNoisy}
-            onAudioFocusChanged={this.onAudioFocusChanged}
-            repeat={false}
-          />
-          {paused && (
-            <View style={styles.playContainer}>
-              <Image source={PLAY} style={{height: 60, width: 60}} />
-            </View>
-          )}
-        </TouchableOpacity>
+          rate={rate}
+          paused={paused}
+          volume={volume}
+          muted={muted}
+          resizeMode={resizeMode}
+          onLoad={onLoad}
+          onProgress={onProgress}
+          onEnd={onEnd}
+          onAudioBecomingNoisy={onAudioBecomingNoisy}
+          onAudioFocusChanged={onAudioFocusChanged}
+          repeat={false}
+        />
+        {paused && (
+          <View style={styles.playContainer}>
+            <Image source={PLAY} style={{height: 60, width: 60}} />
+          </View>
+        )}
+      </TouchableOpacity>
 
-        <View style={styles.controls}>
-          <View style={styles.generalControls}>
+      <View style={styles.controls}>
+        <View style={styles.generalControls}>
+          <View style={styles.volumeControl}>
+            {renderVolumeControl(0.5)}
+            {renderVolumeControl(1)}
+            {renderVolumeControl(1.5)}
+          </View>
 
-            <View style={styles.volumeControl}>
-              {this.renderVolumeControl(0.5)}
-              {this.renderVolumeControl(1)}
-              {this.renderVolumeControl(1.5)}
-            </View>
-
-            <View style={styles.resizeModeControl}>
-              {this.renderResizeModeControl('cover')}
-              {this.renderResizeModeControl('contain')}
-              {this.renderResizeModeControl('stretch')}
-            </View>
+          <View style={styles.resizeModeControl}>
+            {renderResizeModeControl('cover')}
+            {renderResizeModeControl('contain')}
+            {renderResizeModeControl('stretch')}
           </View>
         </View>
       </View>
-    );
-  }
-}
+    </View>
+  );
+};
+
+export default PlayVideo;
