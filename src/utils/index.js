@@ -1,8 +1,8 @@
 import React from 'react';
 import {PermissionsAndroid} from 'react-native';
 
-class CommonHelper {
-  checkPermission = async (name: string) =>
+const CommonHelper = () => {
+  checkPermission = async name =>
     new Promise(resolve =>
       PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS[name])
         .then(async granted => {
@@ -14,6 +14,6 @@ class CommonHelper {
         })
         .catch(() => resolve(false)),
     );
-}
+};
 
 export default CommonHelper;

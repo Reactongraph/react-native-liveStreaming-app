@@ -1,16 +1,15 @@
 import React from 'react';
-import { createAppContainer } from 'react-navigation';
+import {createAppContainer} from 'react-navigation';
 import LiveVideo from './LiveVideo';
 import Dashboard from './Dashboard';
 import Splash from './splash';
 import PlayVideo from './PlayVideo';
-import { createStackNavigator } from 'react-navigation-stack'
-
+import {createStackNavigator} from 'react-navigation-stack';
 
 const AppNavigator = createStackNavigator(
   {
-    Splash:{
-      screen: Splash
+    Splash: {
+      screen: Splash,
     },
     LiveVideo: {
       screen: LiveVideo,
@@ -20,7 +19,7 @@ const AppNavigator = createStackNavigator(
     },
     PlayVideo: {
       screen: PlayVideo,
-    }
+    },
   },
   {
     initialRouteName: 'Splash',
